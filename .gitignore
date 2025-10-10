@@ -1,0 +1,9 @@
+bin/configlet
+bin/configlet.exe
+bcjit
+build/
+**/*.out
+tests.out*
+*.dSYM
+**/*.o
+.DS_Store
