@@ -24,6 +24,7 @@ uint8_t sbox[16][16] = {
 //TODO: where are these constants coming from?
 uint8_t round_contants[]={0x01,0x02,0x04,0x08,0x10,0x20,0x40,0x80,0x1B,0x36};
 
+//TODO: check endian-ness issues
 uint32_t convert_to_uint32(uint8_t arr[4]) {
   uint32_t res = 0;
   res |= arr[0] << 24;
@@ -78,4 +79,68 @@ uint32_t rcon(uint8_t round, uint32_t w)
   res[0] = res[0] ^ round_contants[round-1];
   uint32_t result =convert_to_uint32(res);
   return result;
+}
+
+void expand_key(uint8_t round, uint8_t key[16], uint8_t res[16])
+{
+  uint8_t wordStart = round * 4; 
+  uint8_t wordEnd = wordStart + 4 - 1; 
+  uint32_t words[4] = {0};
+  words[0] =convert_to_uint32((uint8_t[4]){key[0],key[1],key[2],key[3]});
+  words[1] =convert_to_uint32((uint8_t[4]){key[4],key[5],key[6],key[7]});
+  words[2] =convert_to_uint32((uint8_t[4]){key[8],key[9],key[10],key[11]});
+  words[3] =convert_to_uint32((uint8_t[4]){key[12],key[13],key[14],key[15]});
+  if(round == 0) {
+    res[0] =  key[0];
+    res[1] =  key[1];
+    res[2] =  key[2];
+    res[3] =  key[3];
+    res[4] =  key[4];
+    res[5] =  key[5];
+    res[6] =  key[6];
+    res[7] =  key[7];
+    res[8] =  key[8];
+    res[9] =  key[9];
+    res[10] = key[10];
+    res[11] = key[11];
+    res[12] = key[12];
+    res[13] = key[13];
+    res[14] = key[14];
+    res[15] = key[15];
+  } else {
+    uint32_t newWord1 = rcon(round, sub_word(rot_word(words[3])));
+
+    uint8_t newWordArray1[4]= {0};
+    uint8_t newWordArray2[4]= {0};
+    uint8_t newWordArray3[4]= {0};
+    uint8_t newWordArray4[4]= {0};
+
+    uint32_t nword1 = newWord1 ^ words[0];
+    uint32_t nword2 = nword1 ^ words[1];
+    uint32_t nword3 = nword2 ^ words[2];
+    uint32_t nword4 = nword3 ^ words[3];
+
+
+    convert_to_uint8_array(nword1,newWordArray1);
+    convert_to_uint8_array(nword2,newWordArray2);
+    convert_to_uint8_array(nword3,newWordArray3);
+    convert_to_uint8_array(nword4,newWordArray4);
+
+    res[0]  =  newWordArray1[0];
+    res[1]  =  newWordArray1[1];
+    res[2]  =  newWordArray1[2];
+    res[3]  =  newWordArray1[3];
+    res[4]  =  newWordArray2[0];
+    res[5]  =  newWordArray2[1];
+    res[6]  =  newWordArray2[2];
+    res[7]  =  newWordArray2[3];
+    res[8]  =  newWordArray3[0];
+    res[9]  =  newWordArray3[1];
+    res[10] =  newWordArray3[2];
+    res[11] =  newWordArray3[3];
+    res[12] =  newWordArray4[0];
+    res[13] =  newWordArray4[1];
+    res[14] =  newWordArray4[2];
+    res[15] =  newWordArray4[3];
+  }
 }
