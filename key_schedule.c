@@ -1,3 +1,5 @@
+#include <string.h>
+#include <stdio.h>
 #include "key_schedule.h"
 
 //TODO: how to calculate sbox manually?
@@ -142,5 +144,87 @@ void expand_key(uint8_t round, uint8_t key[16], uint8_t res[16])
     res[13] =  newWordArray4[1];
     res[14] =  newWordArray4[2];
     res[15] =  newWordArray4[3];
+  }
+}
+
+void add_round_key(uint8_t round,uint8_t text[16], uint8_t key[16], uint8_t res[16])
+{
+  uint8_t round_key[16] = {0};
+  expand_key(round,key,round_key);
+
+  for (int i=0; i<16; i++) {
+    res[i] = text[i] ^ round_key[i];
+  }
+}
+
+void sub_bytes(uint8_t state[16], uint8_t res[16]){
+  for (int i=0; i<16; i++) {
+    uint8_t row = (state[i] >> 4) & 0xFF;
+    uint8_t col = state[i] & 0x0F;
+    res[i] = sbox[row][col];
+  }
+}
+
+void shift_rows(uint8_t state[16], uint8_t res[16]){
+  res[0] = state[0];
+  res[1] = state[5];
+  res[2] = state[10];
+  res[3] = state[15];
+  res[4] = state[4];
+  res[5] = state[9];
+  res[6] = state[14];
+  res[7] = state[3];
+  res[8] = state[8];
+  res[9] = state[13];
+  res[10] = state[2];
+  res[11] = state[7];
+  res[12] = state[12];
+  res[13] = state[1];
+  res[14] = state[6];
+  res[15] = state[11];
+}
+
+uint8_t mul(uint8_t coefficient, uint8_t val) 
+{
+  if ( coefficient == 1 ) 
+    return val;
+  if (coefficient == 2) {
+    uint8_t temp = 0;
+    temp = coefficient * val;
+    if ((temp / val) != coefficient) {
+      temp = temp ^  0x1B;
+    }
+    return temp;
+  }
+
+  uint8_t res = val ^ mul(coefficient-1,val);
+  return res;
+}
+
+void mix_columns(uint8_t state[16], uint8_t res[16])
+{
+  uint8_t m[4][4] = {
+    {2,3,1,1},
+    {1,2,3,1},
+    {1,1,2,3},
+    {3,1,1,2}
+  };
+
+  uint8_t b = 0;
+  int counter =0;
+  for (int k=0; k<4; k++) {
+    for (int row=0; row<4; row++) {
+      for (int col=0; col<4; col++) {
+        uint8_t ce = m[row][col];
+        uint8_t i = col + (k * 4);
+        uint8_t s = state[i];
+        printf("m(%d,%d)*s(%d)\n",row,col,i);
+        b = b ^ mul(ce,s);
+      }
+      printf("counter=%d\n",counter);
+      res[counter] = b;
+      b = 0;
+      counter++;
+    }
   }
 }
