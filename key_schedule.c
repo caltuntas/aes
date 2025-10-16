@@ -241,3 +241,82 @@ void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16])
     res[i] = mix_columns_res[i] ^ key[i];
   }
 }
+
+
+void aes_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+{
+  uint8_t sub_bytes_res[16] = {0};
+  sub_bytes(state,sub_bytes_res);
+  uint8_t shift_rows_res[16] = {0};
+  shift_rows(sub_bytes_res,shift_rows_res);
+  for (int i=0; i<16; i++) {
+    res[i] = shift_rows_res[i] ^ key[i];
+  }
+}
+
+void print_block(uint8_t block[16]) 
+{
+  for (int i=0; i<16; i++) {
+    printf("%02x,",block[i]);
+  }
+  printf("\n");
+}
+
+//TODO: consider using pointers 
+//TODO: refactor boilerplate loops, duplications
+//TODO: print internal state with flags
+void aes_enc(uint8_t text[16], uint8_t key[16], uint8_t res[16]) 
+{
+  uint8_t round_key[16];
+  uint8_t state[16];
+  for (int i = 0; i < 16; i++) {
+    round_key[i] = key[i];
+  }
+  for (int i = 0; i < 16; i++) {
+    state[i] = text[i];
+  }
+  for (int round=0; round<11; round++) {
+    uint8_t round_keys_res[16] = {0};
+    expand_key(round,round_key,round_keys_res);
+    for (int i = 0; i < 16; i++) {
+      round_key[i] = round_keys_res[i];
+    }
+    printf("round=%d\n",round);
+    printf("current key       -->");
+    print_block(round_key);
+    if (round==0) {
+      for (int i=0; i<16; i++) {
+        state[i] = state[i] ^ round_key[i];
+      }
+      printf("current state     -->");
+      print_block(state);
+      continue;
+    }
+    uint8_t round_res[16] = {0};
+    if (round!=10) {
+      printf("current state     -->");
+      print_block(state);
+      aes_round(state,round_key,round_res);
+      for (int i=0; i<16; i++) {
+        state[i] = round_res[i];
+      }
+      printf("state after round -->");
+      print_block(state);
+    }
+    if (round == 10) {
+      printf("current state     -->");
+      print_block(state);
+      aes_final_round(state,round_key,round_res);
+      for (int i=0; i<16; i++) {
+        state[i] = round_res[i];
+      }
+      printf("state after round -->");
+      print_block(state);
+    }
+  }
+  for (int i=0; i<16; i++) {
+    res[i] = state[i];
+  }
+}
+
+
