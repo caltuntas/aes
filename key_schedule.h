@@ -13,5 +13,6 @@ void add_round_key(uint8_t round,uint8_t text[16], uint8_t key[16], uint8_t res[
 void sub_bytes(uint8_t state[16], uint8_t res[16]);
 void shift_rows(uint8_t state[16], uint8_t res[16]);
 void mix_columns(uint8_t state[16], uint8_t res[16]);
+void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]);
 
 #endif

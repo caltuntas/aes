@@ -218,13 +218,26 @@ void mix_columns(uint8_t state[16], uint8_t res[16])
         uint8_t ce = m[row][col];
         uint8_t i = col + (k * 4);
         uint8_t s = state[i];
-        printf("m(%d,%d)*s(%d)\n",row,col,i);
+        //printf("m(%d,%d)*s(%d)\n",row,col,i);
         b = b ^ mul(ce,s);
       }
-      printf("counter=%d\n",counter);
+      //printf("counter=%d\n",counter);
       res[counter] = b;
       b = 0;
       counter++;
     }
+  }
+}
+
+void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+{
+  uint8_t sub_bytes_res[16] = {0};
+  sub_bytes(state,sub_bytes_res);
+  uint8_t shift_rows_res[16] = {0};
+  shift_rows(sub_bytes_res,shift_rows_res);
+  uint8_t mix_columns_res[16] = {0};
+  mix_columns(shift_rows_res,mix_columns_res);
+  for (int i=0; i<16; i++) {
+    res[i] = mix_columns_res[i] ^ key[i];
   }
 }
