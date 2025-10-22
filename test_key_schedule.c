@@ -152,9 +152,8 @@ static void test_mix_columns(void)
     0x48,0xf8,0xd3,0x7a,  //col 3
     0x28,0x06,0x26,0x4c   //col 4
   };
-  uint8_t res[16] = {0};
-  mix_columns(state,res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,res,16);
+  mix_columns(state);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
 static void test_inv_mix_columns(void)

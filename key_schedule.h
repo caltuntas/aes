@@ -14,7 +14,7 @@ void sub_bytes(uint8_t *state, size_t block_size);
 void inv_sub_bytes(uint8_t state[16], uint8_t res[16]);
 void shift_rows(uint8_t *state, size_t block_size);
 void inv_shift_rows(uint8_t state[16], uint8_t res[16]);
-void mix_columns(uint8_t state[16], uint8_t res[16]);
+void mix_columns(uint8_t *state);
 void inv_mix_columns(uint8_t state[16], uint8_t res[16]);
 void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]);
 void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) ;

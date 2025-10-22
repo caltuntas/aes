@@ -233,7 +233,7 @@ uint8_t mul(uint8_t coefficient, uint8_t val)
   return sum;
 }
 
-void mix_columns(uint8_t state[16], uint8_t res[16])
+void mix_columns(uint8_t *state)
 {
   uint8_t m[4][4] = {
     {2,3,1,1},
@@ -241,6 +241,8 @@ void mix_columns(uint8_t state[16], uint8_t res[16])
     {1,1,2,3},
     {3,1,1,2}
   };
+
+  uint8_t res[16]={0};
 
   uint8_t b = 0;
   int counter =0;
@@ -259,6 +261,7 @@ void mix_columns(uint8_t state[16], uint8_t res[16])
       counter++;
     }
   }
+  memcpy(state,res,16);
 }
 
 void inv_mix_columns(uint8_t state[16], uint8_t res[16])
@@ -294,9 +297,9 @@ void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16])
   sub_bytes(state,16);
   shift_rows(state,16);
   uint8_t mix_columns_res[16] = {0};
-  mix_columns(state,mix_columns_res);
+  mix_columns(state);
   for (int i=0; i<16; i++) {
-    res[i] = mix_columns_res[i] ^ key[i];
+    res[i] = state[i] ^ key[i];
   }
 }
 
