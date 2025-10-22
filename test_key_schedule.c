@@ -204,7 +204,8 @@ static void test_round(void)
 
 static void test_dec_round(void)
 {
-  //round=6 from nist fips document
+  //round=6 check values from https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197-upd1.pdf
+  //Appendix B — Cipher Example
   uint8_t key[16] = {
     0x6d,0x88,0xa3,0x7a, // col 1
     0x11,0x0b,0x3e,0xfd, // col 2

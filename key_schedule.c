@@ -380,45 +380,42 @@ void aes_enc(uint8_t text[16], uint8_t key[16], uint8_t res[16])
   for (int i = 0; i < 16; i++) {
     state[i] = text[i];
   }
+  uint8_t round_res[16] = {0};
+  for (int i=0; i<16; i++) {
+    state[i] = state[i] ^ round_key[i];
+  }
+  printf("current state     -->");
+  print_block(state);
+
+  uint8_t round_keys[11][16] = {0};
   for (int round=0; round<11; round++) {
     uint8_t round_keys_res[16] = {0};
     expand_key(round,round_key,round_keys_res);
-    for (int i = 0; i < 16; i++) {
-      round_key[i] = round_keys_res[i];
-    }
+    memcpy(round_keys[round],round_keys_res,sizeof(round_keys_res));
+    memcpy(round_key,round_keys_res,sizeof(round_keys_res));
+  }
+
+  for (int round=1; round<10; round++) {
     printf("round=%d\n",round);
     printf("current key       -->");
-    print_block(round_key);
-    if (round==0) {
-      for (int i=0; i<16; i++) {
-        state[i] = state[i] ^ round_key[i];
-      }
-      printf("current state     -->");
-      print_block(state);
-      continue;
+    print_block(round_keys[round]);
+    printf("current state     -->");
+    print_block(state);
+    aes_round(state,round_keys[round],round_res);
+    for (int i=0; i<16; i++) {
+      state[i] = round_res[i];
     }
-    uint8_t round_res[16] = {0};
-    if (round!=10) {
-      printf("current state     -->");
-      print_block(state);
-      aes_round(state,round_key,round_res);
-      for (int i=0; i<16; i++) {
-        state[i] = round_res[i];
-      }
-      printf("state after round -->");
-      print_block(state);
-    }
-    if (round == 10) {
-      printf("current state     -->");
-      print_block(state);
-      aes_final_round(state,round_key,round_res);
-      for (int i=0; i<16; i++) {
-        state[i] = round_res[i];
-      }
-      printf("state after round -->");
-      print_block(state);
-    }
+    printf("state after round -->");
+    print_block(state);
   }
+  printf("current state     -->");
+  print_block(state);
+  aes_final_round(state,round_keys[10],round_res);
+  for (int i=0; i<16; i++) {
+    state[i] = round_res[i];
+  }
+  printf("state after round -->");
+  print_block(state);
   for (int i=0; i<16; i++) {
     res[i] = state[i];
   }
