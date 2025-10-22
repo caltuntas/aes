@@ -59,10 +59,8 @@ static void test_expand_key(void)
 
   for (int i=0; i<11; i++) {
     uint8_t *expected=round_keys[i];
-    uint8_t round_key[16] = {0};
-    expand_key(i,key,round_key);
-    TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,round_key,16);
-    memcpy(key,round_key,sizeof(round_key));
+    expand_key(i,key);
+    TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,key,16);
   }
 }
 
@@ -81,9 +79,8 @@ static void test_add_round_key(void)
   uint8_t key[16]={0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3c};
   uint8_t text[16]={0x32,0x43,0xf6,0xa8,0x88,0x5a,0x30,0x8d,0x31,0x31,0x98,0xa2,0xe0,0x37,0x07,0x34};
   uint8_t expected[16]={0x19,0x3d,0xe3,0xbe,0xa0,0xf4,0xe2,0x2b,0x9a,0xc6,0x8d,0x2a,0xe9,0xf8,0x48,0x08};
-  uint8_t expand_key_res[16] = {0};
-  expand_key(0,key,expand_key_res);
-  add_round_key(text,expand_key_res,16);
+  expand_key(0,key);
+  add_round_key(text,key,16);
   TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,text,16);
 }
 
