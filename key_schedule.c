@@ -173,23 +173,25 @@ void inv_sub_bytes(uint8_t state[16], uint8_t res[16]){
   }
 }
 
-void shift_rows(uint8_t state[16], uint8_t res[16]){
-  res[0] = state[0];
-  res[1] = state[5];
-  res[2] = state[10];
-  res[3] = state[15];
-  res[4] = state[4];
-  res[5] = state[9];
-  res[6] = state[14];
-  res[7] = state[3];
-  res[8] = state[8];
-  res[9] = state[13];
-  res[10] = state[2];
-  res[11] = state[7];
-  res[12] = state[12];
-  res[13] = state[1];
-  res[14] = state[6];
-  res[15] = state[11];
+void shift_rows(uint8_t *state,size_t block_size){
+  uint8_t s[16]={0};
+  memcpy(s,state,block_size);
+  state[0]  = s[0];
+  state[1]  = s[5];
+  state[2]  = s[10];
+  state[3]  = s[15];
+  state[4]  = s[4];
+  state[5]  = s[9];
+  state[6]  = s[14];
+  state[7]  = s[3];
+  state[8]  = s[8];
+  state[9]  = s[13];
+  state[10] = s[2];
+  state[11] = s[7];
+  state[12] = s[12];
+  state[13] = s[1];
+  state[14] = s[6];
+  state[15] = s[11];
 }
 
 void inv_shift_rows(uint8_t state[16], uint8_t res[16]){
@@ -290,10 +292,9 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
 void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
   sub_bytes(state,16);
-  uint8_t shift_rows_res[16] = {0};
-  shift_rows(state,shift_rows_res);
+  shift_rows(state,16);
   uint8_t mix_columns_res[16] = {0};
-  mix_columns(shift_rows_res,mix_columns_res);
+  mix_columns(state,mix_columns_res);
   for (int i=0; i<16; i++) {
     res[i] = mix_columns_res[i] ^ key[i];
   }
@@ -320,10 +321,9 @@ void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16])
 void aes_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
   sub_bytes(state,16);
-  uint8_t shift_rows_res[16] = {0};
-  shift_rows(state,shift_rows_res);
+  shift_rows(state,16);
   for (int i=0; i<16; i++) {
-    res[i] = shift_rows_res[i] ^ key[i];
+    res[i] = state[i] ^ key[i];
   }
 }
 
