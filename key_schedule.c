@@ -292,15 +292,12 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
   }
 }
 
-void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_round(uint8_t *state, uint8_t *key) 
 {
   sub_bytes(state,16);
   shift_rows(state,16);
-  uint8_t mix_columns_res[16] = {0};
   mix_columns(state);
-  for (int i=0; i<16; i++) {
-    res[i] = state[i] ^ key[i];
-  }
+  add_round_key(state,key,16);
 }
 
 
@@ -321,13 +318,11 @@ void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16])
   }
 }
 
-void aes_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_final_round(uint8_t *state, uint8_t *key) 
 {
   sub_bytes(state,16);
   shift_rows(state,16);
-  for (int i=0; i<16; i++) {
-    res[i] = state[i] ^ key[i];
-  }
+  add_round_key(state,key,16);
 }
 
 void aes_dec_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
@@ -354,7 +349,6 @@ void print_block(uint8_t block[16])
 //TODO: print internal state with flags
 void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
-  uint8_t round_res[16] = {0};
   add_round_key(state,key,16);
   printf("current state     -->");
   print_block(state);
@@ -371,19 +365,13 @@ void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16])
     print_block(round_keys[round]);
     printf("current state     -->");
     print_block(state);
-    aes_round(state,round_keys[round],round_res);
-    for (int i=0; i<16; i++) {
-      state[i] = round_res[i];
-    }
+    aes_round(state,round_keys[round]);
     printf("state after round -->");
     print_block(state);
   }
   printf("current state     -->");
   print_block(state);
-  aes_final_round(state,round_keys[10],round_res);
-  for (int i=0; i<16; i++) {
-    state[i] = round_res[i];
-  }
+  aes_final_round(state,round_keys[10]);
   printf("state after round -->");
   print_block(state);
   for (int i=0; i<16; i++) {

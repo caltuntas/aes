@@ -190,9 +190,8 @@ static void test_round(void)
     0x6b,0x5b,0xea,0x43, //column 3
     0x02,0x6a,0x50,0x49  //column 4
   };
-  uint8_t res[16] = {0};
-  aes_round(state,key, res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,res,16);
+  aes_round(state,key);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
 static void test_dec_round(void)
@@ -246,8 +245,8 @@ static void test_final_round(void)
     0x19,0x6a,0x0b,0x32   // col 3
   };
   uint8_t res[16] = {0};
-  aes_final_round(state, key, res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, res, 16);
+  aes_final_round(state, key);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, state, 16);
 }
 
 static void test_aes_enc(void)
