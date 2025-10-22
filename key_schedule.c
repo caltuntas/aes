@@ -157,11 +157,11 @@ void add_round_key(uint8_t *state, uint8_t *key, size_t block_size)
   }
 }
 
-void sub_bytes(uint8_t state[16], uint8_t res[16]){
-  for (int i=0; i<16; i++) {
+void sub_bytes(uint8_t *state, size_t block_size){
+  for (int i=0; i<block_size; i++) {
     uint8_t row = (state[i] >> 4) & 0xFF;
     uint8_t col = state[i] & 0x0F;
-    res[i] = sbox[row][col];
+    state[i] = sbox[row][col];
   }
 }
 
@@ -289,10 +289,9 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
 
 void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
-  uint8_t sub_bytes_res[16] = {0};
-  sub_bytes(state,sub_bytes_res);
+  sub_bytes(state,16);
   uint8_t shift_rows_res[16] = {0};
-  shift_rows(sub_bytes_res,shift_rows_res);
+  shift_rows(state,shift_rows_res);
   uint8_t mix_columns_res[16] = {0};
   mix_columns(shift_rows_res,mix_columns_res);
   for (int i=0; i<16; i++) {
@@ -320,10 +319,9 @@ void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16])
 
 void aes_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
-  uint8_t sub_bytes_res[16] = {0};
-  sub_bytes(state,sub_bytes_res);
+  sub_bytes(state,16);
   uint8_t shift_rows_res[16] = {0};
-  shift_rows(sub_bytes_res,shift_rows_res);
+  shift_rows(state,shift_rows_res);
   for (int i=0; i<16; i++) {
     res[i] = shift_rows_res[i] ^ key[i];
   }
@@ -351,25 +349,17 @@ void print_block(uint8_t block[16])
 //TODO: consider using pointers 
 //TODO: refactor boilerplate loops, duplications
 //TODO: print internal state with flags
-void aes_enc(uint8_t text[16], uint8_t key[16], uint8_t res[16]) 
+void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
 {
-  uint8_t round_key[16];
-  uint8_t state[16];
-  for (int i = 0; i < 16; i++) {
-    round_key[i] = key[i];
-  }
-  for (int i = 0; i < 16; i++) {
-    state[i] = text[i];
-  }
   uint8_t round_res[16] = {0};
-  add_round_key(state,round_key,16);
+  add_round_key(state,key,16);
   printf("current state     -->");
   print_block(state);
 
   uint8_t round_keys[11][16] = {0};
   for (int round=0; round<11; round++) {
-    expand_key(round,round_key);
-    memcpy(round_keys[round],round_key,sizeof(round_key));
+    expand_key(round,key);
+    memcpy(round_keys[round],key,16);
   }
 
   for (int round=1; round<10; round++) {
@@ -411,7 +401,6 @@ void aes_dec(uint8_t text[16], uint8_t key[16], uint8_t res[16])
     expand_key(round,round_key);
     memcpy(round_keys[round],round_key,sizeof(round_key));
   }
-
 
   printf("----expanded round keys----\n");
   for (int i = 0; i < 11; i++) {

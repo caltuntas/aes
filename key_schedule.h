@@ -10,7 +10,7 @@ uint32_t sub_word(uint32_t w);
 uint32_t rcon(uint8_t round, uint32_t w);
 void expand_key(uint8_t round, uint8_t *key);
 void add_round_key(uint8_t *state, uint8_t *key, size_t block_size);
-void sub_bytes(uint8_t state[16], uint8_t res[16]);
+void sub_bytes(uint8_t *state, size_t block_size);
 void inv_sub_bytes(uint8_t state[16], uint8_t res[16]);
 void shift_rows(uint8_t state[16], uint8_t res[16]);
 void inv_shift_rows(uint8_t state[16], uint8_t res[16]);
