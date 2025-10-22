@@ -104,50 +104,46 @@ uint32_t rcon(uint8_t round, uint32_t w)
 
 void expand_key(uint8_t round, uint8_t *key)
 {
-  uint8_t wordStart = round * 4; 
-  uint8_t wordEnd = wordStart + 4 - 1; 
+  if(round == 0)
+    return;
   uint32_t words[4] = {0};
   words[0] =convert_to_uint32((uint8_t[4]){key[0],key[1],key[2],key[3]});
   words[1] =convert_to_uint32((uint8_t[4]){key[4],key[5],key[6],key[7]});
   words[2] =convert_to_uint32((uint8_t[4]){key[8],key[9],key[10],key[11]});
   words[3] =convert_to_uint32((uint8_t[4]){key[12],key[13],key[14],key[15]});
-  if(round == 0) {
-  } else {
-    uint32_t newWord1 = rcon(round, sub_word(rot_word(words[3])));
+  uint32_t newWord1 = rcon(round, sub_word(rot_word(words[3])));
 
-    uint8_t newWordArray1[4]= {0};
-    uint8_t newWordArray2[4]= {0};
-    uint8_t newWordArray3[4]= {0};
-    uint8_t newWordArray4[4]= {0};
+  uint8_t newWordArray1[4]= {0};
+  uint8_t newWordArray2[4]= {0};
+  uint8_t newWordArray3[4]= {0};
+  uint8_t newWordArray4[4]= {0};
 
-    uint32_t nword1 = newWord1 ^ words[0];
-    uint32_t nword2 = nword1 ^ words[1];
-    uint32_t nword3 = nword2 ^ words[2];
-    uint32_t nword4 = nword3 ^ words[3];
+  uint32_t nword1 = newWord1 ^ words[0];
+  uint32_t nword2 = nword1 ^ words[1];
+  uint32_t nword3 = nword2 ^ words[2];
+  uint32_t nword4 = nword3 ^ words[3];
 
+  convert_to_uint8_array(nword1,newWordArray1);
+  convert_to_uint8_array(nword2,newWordArray2);
+  convert_to_uint8_array(nword3,newWordArray3);
+  convert_to_uint8_array(nword4,newWordArray4);
 
-    convert_to_uint8_array(nword1,newWordArray1);
-    convert_to_uint8_array(nword2,newWordArray2);
-    convert_to_uint8_array(nword3,newWordArray3);
-    convert_to_uint8_array(nword4,newWordArray4);
-
-    key[0]  =  newWordArray1[0];
-    key[1]  =  newWordArray1[1];
-    key[2]  =  newWordArray1[2];
-    key[3]  =  newWordArray1[3];
-    key[4]  =  newWordArray2[0];
-    key[5]  =  newWordArray2[1];
-    key[6]  =  newWordArray2[2];
-    key[7]  =  newWordArray2[3];
-    key[8]  =  newWordArray3[0];
-    key[9]  =  newWordArray3[1];
-    key[10] =  newWordArray3[2];
-    key[11] =  newWordArray3[3];
-    key[12] =  newWordArray4[0];
-    key[13] =  newWordArray4[1];
-    key[14] =  newWordArray4[2];
-    key[15] =  newWordArray4[3];
-  }
+  key[0]  =  newWordArray1[0];
+  key[1]  =  newWordArray1[1];
+  key[2]  =  newWordArray1[2];
+  key[3]  =  newWordArray1[3];
+  key[4]  =  newWordArray2[0];
+  key[5]  =  newWordArray2[1];
+  key[6]  =  newWordArray2[2];
+  key[7]  =  newWordArray2[3];
+  key[8]  =  newWordArray3[0];
+  key[9]  =  newWordArray3[1];
+  key[10] =  newWordArray3[2];
+  key[11] =  newWordArray3[3];
+  key[12] =  newWordArray4[0];
+  key[13] =  newWordArray4[1];
+  key[14] =  newWordArray4[2];
+  key[15] =  newWordArray4[3];
 }
 
 void add_round_key(uint8_t *state, uint8_t *key, size_t block_size)
@@ -252,10 +248,8 @@ void mix_columns(uint8_t *state)
         uint8_t ce = m[row][col];
         uint8_t i = col + (k * 4);
         uint8_t s = state[i];
-        //printf("m(%d,%d)*s(%d)\n",row,col,i);
         b = b ^ mul(ce,s);
       }
-      //printf("counter=%d\n",counter);
       res[counter] = b;
       b = 0;
       counter++;
@@ -281,10 +275,8 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
         uint8_t ce = m[row][col];
         uint8_t i = col + (k * 4);
         uint8_t s = state[i];
-        //printf("m(%d,%d)*s(%d)\n",row,col,i);
         b = b ^ mul(ce,s);
       }
-      //printf("counter=%d\n",counter);
       res[counter] = b;
       b = 0;
       counter++;
@@ -344,6 +336,16 @@ void print_block(uint8_t block[16])
   printf("\n");
 }
 
+void expand_keys(uint8_t *key, uint8_t key_store[11][16]) 
+{
+  for (int round=0; round<11; round++) {
+    expand_key(round,key);
+    memcpy(key_store[round],key,16);
+  }
+}
+
+
+
 //TODO: consider using pointers 
 //TODO: refactor boilerplate loops, duplications
 //TODO: print internal state with flags
@@ -353,25 +355,22 @@ void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16])
   printf("current state     -->");
   print_block(state);
 
-  uint8_t round_keys[11][16] = {0};
-  for (int round=0; round<11; round++) {
-    expand_key(round,key);
-    memcpy(round_keys[round],key,16);
-  }
+  uint8_t keys[11][16] = {0};
+  expand_keys(key,keys);
 
   for (int round=1; round<10; round++) {
     printf("round=%d\n",round);
     printf("current key       -->");
-    print_block(round_keys[round]);
+    print_block(keys[round]);
     printf("current state     -->");
     print_block(state);
-    aes_round(state,round_keys[round]);
+    aes_round(state,keys[round]);
     printf("state after round -->");
     print_block(state);
   }
   printf("current state     -->");
   print_block(state);
-  aes_final_round(state,round_keys[10]);
+  aes_final_round(state,keys[10]);
   printf("state after round -->");
   print_block(state);
   for (int i=0; i<16; i++) {
