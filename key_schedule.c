@@ -166,13 +166,10 @@ void expand_key(uint8_t round, uint8_t key[16], uint8_t res[16])
   }
 }
 
-void add_round_key(uint8_t round,uint8_t text[16], uint8_t key[16], uint8_t res[16])
+void add_round_key(uint8_t *state, uint8_t *key, size_t block_size)
 {
-  //uint8_t round_key[16] = {0};
-  //expand_key(round,key,round_key);
-
-  for (int i=0; i<16; i++) {
-    res[i] = text[i] ^ key[i];
+  for (int i=0; i<block_size; i++) {
+    state[i] = state[i] ^ key[i];
   }
 }
 
@@ -380,10 +377,14 @@ void aes_enc(uint8_t text[16], uint8_t key[16], uint8_t res[16])
   for (int i = 0; i < 16; i++) {
     state[i] = text[i];
   }
+  /*
   uint8_t round_res[16] = {0};
   for (int i=0; i<16; i++) {
     state[i] = state[i] ^ round_key[i];
   }
+  */
+  uint8_t round_res[16] = {0};
+  add_round_key(state,round_key,16);
   printf("current state     -->");
   print_block(state);
 
