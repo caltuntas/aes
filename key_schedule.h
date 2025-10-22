@@ -17,8 +17,11 @@ void inv_shift_rows(uint8_t state[16], uint8_t res[16]);
 void mix_columns(uint8_t state[16], uint8_t res[16]);
 void inv_mix_columns(uint8_t state[16], uint8_t res[16]);
 void aes_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]);
+void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) ;
 void aes_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]);
+void aes_dec_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]);
 void aes_enc(uint8_t text[16], uint8_t key[16], uint8_t res[16]);
+void aes_dec(uint8_t text[16], uint8_t key[16], uint8_t res[16]);
 uint8_t mul(uint8_t coefficient, uint8_t val) ;
 
 #endif
