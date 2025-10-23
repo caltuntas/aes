@@ -133,9 +133,8 @@ static void test_inv_shift_rows(void)
     0xb8,0x41,0x11,0xf1,   //col 3
     0x1e,0x27,0x98,0xe5    //col 4
   };
-  uint8_t res[16] = {0};
-  inv_shift_rows(state,res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,res,16);
+  inv_shift_rows(state,16);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
 static void test_mix_columns(void)

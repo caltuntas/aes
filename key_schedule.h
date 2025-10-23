@@ -13,7 +13,7 @@ void add_round_key(uint8_t *state, uint8_t *key, size_t block_size);
 void sub_bytes(uint8_t *state, size_t block_size);
 void inv_sub_bytes(uint8_t state[16], uint8_t res[16]);
 void shift_rows(uint8_t *state, size_t block_size);
-void inv_shift_rows(uint8_t state[16], uint8_t res[16]);
+void inv_shift_rows(uint8_t *state, size_t block_size );
 void mix_columns(uint8_t *state);
 void inv_mix_columns(uint8_t state[16], uint8_t res[16]);
 void aes_round(uint8_t *state, uint8_t *key);
