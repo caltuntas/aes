@@ -260,7 +260,7 @@ void mix_columns(uint8_t *state)
   memcpy(state,res,16);
 }
 
-void inv_mix_columns(uint8_t state[16], uint8_t res[16])
+void inv_mix_columns(uint8_t *state)
 {
   uint8_t m[4][4] = {
     {0x0e,0x0b,0x0d,0x09},
@@ -268,7 +268,7 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
     {0x0d,0x09,0x0e,0x0b},
     {0x0b,0x0d,0x09,0x0e},
   };
-
+  uint8_t res[16]={0};
   uint8_t b = 0;
   int counter =0;
   for (int k=0; k<4; k++) {
@@ -284,6 +284,7 @@ void inv_mix_columns(uint8_t state[16], uint8_t res[16])
       counter++;
     }
   }
+  memcpy(state,res,16);
 }
 
 void aes_round(uint8_t *state, uint8_t *key) 
@@ -295,16 +296,12 @@ void aes_round(uint8_t *state, uint8_t *key)
 }
 
 
-void aes_dec_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_dec_round(uint8_t *state, uint8_t *key) 
 {
   inv_shift_rows(state,16);
   inv_sub_bytes(state,16);
   add_round_key(state,key,16);
-  uint8_t mix_columns_res[16] = {0};
-  inv_mix_columns(state,mix_columns_res);
-  for (int i=0; i<16; i++) {
-    res[i] = mix_columns_res[i];
-  }
+  inv_mix_columns(state);
 }
 
 void aes_final_round(uint8_t *state, uint8_t *key) 
@@ -314,13 +311,11 @@ void aes_final_round(uint8_t *state, uint8_t *key)
   add_round_key(state,key,16);
 }
 
-void aes_dec_final_round(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_dec_final_round(uint8_t *state, uint8_t *key) 
 {
   inv_shift_rows(state,16);
   inv_sub_bytes(state,16);
-  for (int i=0; i<16; i++) {
-    res[i] = state[i] ^ key[i];
-  }
+  add_round_key(state,key,16);
 }
 
 void print_block(uint8_t block[16]) 
@@ -399,19 +394,13 @@ void aes_dec(uint8_t state[16], uint8_t key[16], uint8_t res[16])
     print_block(keys[round]);
     printf("current state     -->");
     print_block(state);
-    aes_dec_round(state,keys[round],round_res);
-    for (int i=0; i<16; i++) {
-      state[i] = round_res[i];
-    }
+    aes_dec_round(state,keys[round]);
     printf("state after round -->");
     print_block(state);
   }
   printf("current state     -->");
   print_block(state);
-  aes_dec_final_round(state,keys[0],round_res);
-  for (int i=0; i<16; i++) {
-    state[i] = round_res[i];
-  }
+  aes_dec_final_round(state,keys[0]);
   printf("state after round -->");
   print_block(state);
   for (int i=0; i<16; i++) {

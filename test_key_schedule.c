@@ -168,9 +168,8 @@ static void test_inv_mix_columns(void)
     0xb8,0x41,0x11,0xf1, //col 3
     0x1e,0x27,0x98,0xe5  //col 4
   };
-  uint8_t res[16] = {0};
-  inv_mix_columns(state,res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,res,16);
+  inv_mix_columns(state);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
 static void test_round(void)
@@ -217,9 +216,8 @@ static void test_dec_round(void)
     0x4c,0x63,0x29,0x23    // col 4
   };
 
-  uint8_t res[16] = {0};
-  aes_dec_round(state, key, res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, res, 16);
+  aes_dec_round(state, key);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, state, 16);
 }
 
 static void test_final_round(void)
