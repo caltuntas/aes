@@ -161,11 +161,11 @@ void sub_bytes(uint8_t *state, size_t block_size){
   }
 }
 
-void inv_sub_bytes(uint8_t state[16], uint8_t res[16]){
-  for (int i=0; i<16; i++) {
+void inv_sub_bytes(uint8_t *state, size_t block_size){
+  for (int i=0; i<block_size; i++) {
     uint8_t row = (state[i] >> 4) & 0xFF;
     uint8_t col = state[i] & 0x0F;
-    res[i] = inv_sbox[row][col];
+    state[i] = inv_sbox[row][col];
   }
 }
 
