@@ -291,12 +291,8 @@ void expand_keys(uint8_t *key, uint8_t key_store[11][16])
   }
 }
 
-
-
-//TODO: consider using pointers 
-//TODO: refactor boilerplate loops, duplications
 //TODO: print internal state with flags
-void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_enc(uint8_t *state, uint8_t *key) 
 {
   uint8_t keys[11][16] = {0};
   expand_keys(key,keys);
@@ -311,13 +307,10 @@ void aes_enc(uint8_t state[16], uint8_t key[16], uint8_t res[16])
   sub_bytes(state,16);
   shift_rows(state,16);
   add_round_key(state,keys[10],16); 
-  for (int i=0; i<16; i++) {
-    res[i] = state[i];
-  }
 }
 
 
-void aes_dec(uint8_t state[16], uint8_t key[16], uint8_t res[16]) 
+void aes_dec(uint8_t *state, uint8_t *key) 
 {
   uint8_t keys[11][16] = {0};
   expand_keys(key,keys);
@@ -331,7 +324,4 @@ void aes_dec(uint8_t state[16], uint8_t key[16], uint8_t res[16])
   inv_shift_rows(state,16);
   inv_sub_bytes(state,16);
   add_round_key(state,keys[0],16);
-  for (int i=0; i<16; i++) {
-    res[i] = state[i];
-  }
 }

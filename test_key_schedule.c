@@ -192,9 +192,8 @@ static void test_aes_enc(void)
     0xdc,0x11,0x85,0x97,  // col 2
     0x19,0x6a,0x0b,0x32   // col 3
   };
-  uint8_t res[16] = {0};
-  aes_enc(text, key, res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, res, 16);
+  aes_enc(text, key);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, text, 16);
 }
 
 static void test_aes_dec(void)
@@ -217,9 +216,8 @@ static void test_aes_dec(void)
     0xdc,0x11,0x85,0x97,  // col 2
     0x19,0x6a,0x0b,0x32   // col 3
   };
-  uint8_t res[16] = {0};
-  aes_dec(cipher_text, key, res);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, res, 16);
+  aes_dec(cipher_text, key);
+  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, cipher_text, 16);
 }
 
 static void test_add_round_key_10(void)
