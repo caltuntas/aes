@@ -172,26 +172,6 @@ static void test_inv_mix_columns(void)
   TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
-static void test_round(void)
-{
-  uint8_t key[16]={0xa0,0xfa,0xfe,0x17,0x88,0x54,0x2c,0xb1,0x23,0xa3,0x39,0x39,0x2a,0x6c,0x76,0x05,};
-  uint8_t state[16]={
-    0x19,0x3d,0xe3,0xbe, //column 1
-    0xa0,0xf4,0xe2,0x2b, //column 2
-    0x9a,0xc6,0x8d,0x2a, //column 3
-    0xe9,0xf8,0x48,0x08  //column 4
-  };
-  uint8_t expected[16]={
-    0xa4,0x9c,0x7f,0xf2, //column 1
-    0x68,0x9f,0x35,0x2b, //column 2
-    0x6b,0x5b,0xea,0x43, //column 3
-    0x02,0x6a,0x50,0x49  //column 4
-  };
-  aes_round(state,key);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
-}
-
-
 static void test_aes_enc(void)
 {
   uint8_t key[16]={
@@ -314,7 +294,6 @@ int main(void)
   RUN_TEST(test_inv_shift_rows);
   RUN_TEST(test_mix_columns);
   RUN_TEST(test_inv_mix_columns);
-  RUN_TEST(test_round);
   RUN_TEST(test_aes_enc);
   RUN_TEST(test_add_round_key_10);
   RUN_TEST(test_mul);

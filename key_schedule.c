@@ -275,37 +275,6 @@ void inv_mix_columns(uint8_t *state)
   mix_cols(m,state);
 }
 
-void aes_round(uint8_t *state, uint8_t *key) 
-{
-  sub_bytes(state,16);
-  shift_rows(state,16);
-  mix_columns(state);
-  add_round_key(state,key,16);
-}
-
-
-void aes_dec_round(uint8_t *state, uint8_t *key) 
-{
-  inv_shift_rows(state,16);
-  inv_sub_bytes(state,16);
-  add_round_key(state,key,16);
-  inv_mix_columns(state);
-}
-
-void aes_final_round(uint8_t *state, uint8_t *key) 
-{
-  sub_bytes(state,16);
-  shift_rows(state,16);
-  add_round_key(state,key,16);
-}
-
-void aes_dec_final_round(uint8_t *state, uint8_t *key) 
-{
-  inv_shift_rows(state,16);
-  inv_sub_bytes(state,16);
-  add_round_key(state,key,16);
-}
-
 void print_block(uint8_t block[16]) 
 {
   for (int i=0; i<16; i++) {
