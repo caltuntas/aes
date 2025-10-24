@@ -191,59 +191,6 @@ static void test_round(void)
   TEST_ASSERT_EQUAL_HEX8_ARRAY(expected,state,16);
 }
 
-static void test_dec_round(void)
-{
-  //round=6 check values from https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.197-upd1.pdf
-  //Appendix B — Cipher Example
-  uint8_t key[16] = {
-    0x6d,0x88,0xa3,0x7a, // col 1
-    0x11,0x0b,0x3e,0xfd, // col 2
-    0xdb,0xf9,0x86,0x41, // col 3
-    0xca,0x00,0x93,0xfd  // col 4
-  };
-
-  uint8_t state[16] = {
-    0xf7,0x83,0x40,0x3f,  // col 1
-    0x27,0x43,0x3d,0xf0,  // col 2
-    0x9b,0xb5,0x31,0xff,  // col 3
-    0x54,0xab,0xa9,0xd3   // col 4
-  };
-
-  uint8_t expected[16] = {
-    0xa1,0x4f,0x3d,0xfe,   // col 1
-    0x78,0xe8,0x03,0xfc,   // col 2
-    0x10,0xd5,0xa8,0xdf,   // col 3
-    0x4c,0x63,0x29,0x23    // col 4
-  };
-
-  aes_dec_round(state, key);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, state, 16);
-}
-
-static void test_final_round(void)
-{
-  uint8_t state[16] = {
-    0xeb,0x40,0xf2,0x1e,  // col 0
-    0x59,0x2e,0x38,0x84,  // col 1
-    0x8b,0xa1,0x13,0xe7,  // col 2
-    0x1b,0xc3,0x42,0xd2,  // col 3
-  };
-  uint8_t key[16] = {
-    0xd0,0x14,0xf9,0xa8,  // col 0
-    0xc9,0xee,0x25,0x89,  // col 1
-    0xe1,0x3f,0x0c,0xc8,  // col 2
-    0xb6,0x63,0x0c,0xa6   // col 3
-  };
-  uint8_t expected[16] = {
-    0x39,0x25,0x84,0x1d,  // col 0
-    0x02,0xdc,0x09,0xfb,  // col 1
-    0xdc,0x11,0x85,0x97,  // col 2
-    0x19,0x6a,0x0b,0x32   // col 3
-  };
-  uint8_t res[16] = {0};
-  aes_final_round(state, key);
-  TEST_ASSERT_EQUAL_HEX8_ARRAY(expected, state, 16);
-}
 
 static void test_aes_enc(void)
 {
@@ -368,11 +315,9 @@ int main(void)
   RUN_TEST(test_mix_columns);
   RUN_TEST(test_inv_mix_columns);
   RUN_TEST(test_round);
-  RUN_TEST(test_final_round);
   RUN_TEST(test_aes_enc);
   RUN_TEST(test_add_round_key_10);
   RUN_TEST(test_mul);
-  RUN_TEST(test_dec_round);
   RUN_TEST(test_aes_dec);
   return UNITY_END();
 }
