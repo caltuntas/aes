@@ -1,5 +1,5 @@
 #include "test-framework/unity.h"
-#include "key_schedule.h"
+#include "aes.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

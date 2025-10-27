@@ -1,10 +1,10 @@
 CFLAGS = -O2 -g
 all:
-	gcc $(CFLAGS) main.c key_schedule.c -o aes
+	gcc $(CFLAGS) main.c aes.c -o aes
 
 test:
-	gcc -g test-framework/unity.c key_schedule.c test_key_schedule.c -o test_key_schedule.out
-	./test_key_schedule.out
+	gcc -g test-framework/unity.c aes.c test_aes.c -o test_aes.out
+	./test_aes.out
 
 clean:
 	rm -rf *.out *.o *.dSYM

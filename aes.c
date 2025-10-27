@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdio.h>
-#include "key_schedule.h"
+#include "aes.h"
 
 //TODO: how to calculate sbox manually?
 uint8_t sbox[16][16] = {
@@ -56,11 +56,16 @@ uint32_t convert_to_uint32(uint8_t arr[4]) {
 }
 
 void convert_to_uint8_array(uint32_t w,uint8_t arr[4]) {
-  uint8_t res[4] = {0};
-  arr[0] = w >> 24;
-  arr[1] = w >> 16;
-  arr[2] = w >> 8;
-  arr[3] = w >> 0;
+  uint8_t *ptr =(uint8_t*)&w;
+  arr[0] = ptr[3];
+  arr[1] = ptr[2];
+  arr[2] = ptr[1];
+  arr[3] = ptr[0];
+
+  //arr[0] = w >> 24;
+  //arr[1] = w >> 16;
+  //arr[2] = w >> 8;
+  //arr[3] = w >> 0;
 }
 
 
