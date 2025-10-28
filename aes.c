@@ -281,11 +281,13 @@ void print_block(uint8_t block[16])
   printf("\n");
 }
 
-void expand_keys(uint8_t *key, uint8_t key_store[11][16]) 
+void expand_keys(const uint8_t *key, uint8_t key_store[11][16]) 
 {
+  uint8_t original_key[16]={0};
+  memcpy(original_key,key,16);
   for (int round=0; round<11; round++) {
-    expand_key(round,key);
-    memcpy(key_store[round],key,16);
+    expand_key(round,original_key);
+    memcpy(key_store[round],original_key,16);
   }
 }
 
@@ -322,4 +324,50 @@ void aes_dec(uint8_t *state, uint8_t *key)
   inv_shift_rows(state,16);
   inv_sub_bytes(state,16);
   add_round_key(state,keys[0],16);
+}
+
+void aes_cbc_enc(uint8_t *text, uint8_t *key, uint8_t *iv)
+{
+  uint8_t original_key[16]={0};
+  memcpy(original_key,key,16);
+  uint8_t block0[16]={0};
+  uint8_t block1[16]={0};
+  uint8_t block2[16]={0};
+  uint8_t text0[16]={0};
+  uint8_t text1[16]={0};
+  uint8_t text2[16]={0};
+
+  for (int i=0; i<16; i++) {
+    text0[i] = text[i];
+  }
+
+  for (int i=16; i<32; i++) {
+    text1[i-16] = text[i];
+  }
+
+  for (int i=32; i<48; i++) {
+    text2[i-32] = text[i];
+  }
+
+  for (int i=0; i<16; i++) {
+    block0[i] = iv[i] ^ text0[i];
+  }
+
+  aes_enc(block0,original_key);
+
+  memcpy(text,block0,16); 
+
+  for (int i=0; i<16; i++) {
+    block1[i] = block0[i] ^ text1[i];
+  }
+
+  aes_enc(block1,key);
+  memcpy(text+16,block1,16); 
+
+  for (int i=0; i<16; i++) {
+    block2[i] = block1[i] ^ text2[i];
+  }
+
+  aes_enc(block2,key);
+  memcpy(text+32,block2,16); 
 }

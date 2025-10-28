@@ -19,5 +19,6 @@ void inv_mix_columns(uint8_t *state);
 void aes_enc(uint8_t *text, uint8_t *key);
 void aes_dec(uint8_t *text, uint8_t *key);
 uint8_t mul(uint8_t coefficient, uint8_t val) ;
+void aes_cbc_enc(uint8_t *text, uint8_t *key, uint8_t *iv);
 
 #endif
