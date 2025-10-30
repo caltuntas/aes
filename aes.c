@@ -144,11 +144,16 @@ void expand_key(uint8_t round, uint8_t *key)
   key[15] =  newWordArray4[3];
 }
 
-void add_round_key(uint8_t *state, uint8_t *key, size_t block_size)
+void xor_buffers(uint8_t *dst, uint8_t *src, size_t block_size)
 {
   for (int i=0; i<block_size; i++) {
-    state[i] = state[i] ^ key[i];
+    dst[i] = dst[i] ^ src[i];
   }
+}
+
+void add_round_key(uint8_t *state, uint8_t *key, size_t block_size)
+{
+  xor_buffers(state,key,block_size);
 }
 
 void sub_bytes(uint8_t *state, size_t block_size){
@@ -332,9 +337,9 @@ void aes_cbc_enc(uint8_t *text, uint8_t *key, uint8_t *iv)
   memcpy(block,iv,16); 
 
   for (int i=0; i<3; i++) {
-    for (int j=0; j<16; j++) {
-      block[j] = block[j] ^ text[j+(i*16)];
-    }
+    uint8_t pt[16]={0};
+    memcpy(pt,text+i*16,16);
+    xor_buffers(block,pt,16);
     aes_enc(block,key);
     memcpy(text+i*16,block,16); 
   }
