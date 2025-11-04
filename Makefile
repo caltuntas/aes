@@ -1,4 +1,4 @@
-CFLAGS = -O2 -g
+CFLAGS = -g
 all:
 	gcc $(CFLAGS) main.c aes.c -o aes
 
